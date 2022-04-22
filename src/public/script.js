@@ -1,30 +1,24 @@
-const form = document.querySelector('#form');
-const inputX = form.querySelector('#x');
-const inputY = form.querySelector('#y');
-
+const body = document.querySelector('body');
 const socket = io('ws://localhost:4000');
-let player;
 const playersOnline = new Map();
+let player;
+
+body.addEventListener('keydown', eventOfMovement);
 
 socket.on('login', data => {
-  player = data;
-  console.log(player);
+  player = createPlayer(data.player);
+  drawInScreen(body, player, data.player.position);
+
+  data.playersOnline.forEach(player => {
+    const temp = createPlayer(player);
+
+    playersOnline.set(player.id, temp);
+    drawInScreen(body, temp, data.player.position);
+  });
 });
 
 socket.on('clientMovement', data => {
-  const player = players.get(data.who);
-  player.position.x = data.newPosition.x;
-  player.position.y = data.newPosition.y;
-  players.set(data.who, player);
-});
-
-form.addEventListener('submit', event => {
-  event.preventDefault();
-
-  const movement = {
-    x: inputX.value || 0,
-    y: inputY.value || 0,
-  };
-
-  socket.emit('movement', movement);
+  const player = playersOnline.get(data.who);
+  player.style.top = data.newPosition.y;
+  player.style.left = data.newPosition.x;
 });

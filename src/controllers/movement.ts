@@ -1,15 +1,11 @@
-export const playersOnline = (clientsConnected: any) => {
-  const clients = Array.from(clientsConnected.keys());
+import { clientsConnected, clientEvent } from '../servers/server-socket';
 
-  const temp: Array<any> = [];
+clientEvent.on('movement', (value, socket) => {
+  const client = clientsConnected.get(socket.id);
+  clientsConnected.set(socket.id, { ...client, position: value });
 
-  clients.forEach(idClient => {
-    const { id, color, position } = clientsConnected.get(idClient);
-    temp.push({ id, color, position });
-  });
-
-  return temp;
-};
+  notifyAllClientOfMovement(clientsConnected, socket.id);
+});
 
 export const notifyAllClientOfMovement = (clientsConnected: Map<any, any>, whoSetMovement: string) => {
   const clients = Array.from(clientsConnected.keys());
