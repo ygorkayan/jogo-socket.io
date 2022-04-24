@@ -1,44 +1,20 @@
-import { clientsConnected, clientEvent } from '../servers/server-socket';
+import { clientEvent } from '../servers/server-socket';
+import { IPlayersConnected } from '../helpers/interfaces';
+import { colorRandom } from '../helpers/functions';
 
-clientEvent.on('player-login', socket => {
+clientEvent.on('player-login', (socket: any, playersConected: IPlayersConnected) => {
   const player = {
     id: socket.id,
     color: colorRandom(),
     position: { x: 0, y: 0 },
   };
 
+  const playersOnline = playersConected.map(({ id, color, position }) => ({ id, color, position }));
+
   socket.emit('player-login', {
     player,
-    playersOnline: playersOnline(clientsConnected),
+    playersOnline,
   });
 
-  clientsConnected.set(player.id, { ...player, socket });
+  playersConected.push({ ...player, socket });
 });
-
-export const playersOnline = (clientsConnected: any) => {
-  const players: Array<any> = [];
-
-  clientsConnected.forEach((player: any) => {
-    players.push({ id: player.id, color: player.color, position: player.position });
-  });
-
-  return players;
-};
-
-export const colorRandom = () => {
-  const colors: Record<number, string> = {
-    0: 'red',
-    1: 'black',
-    2: 'blue',
-    3: 'yellow',
-    4: 'green',
-    5: 'brown',
-    6: 'aqua',
-    7: 'turquoise',
-    8: 'coral',
-    9: 'blueviolet',
-    10: 'darkcyan',
-  };
-
-  return colors[Math.floor(Math.random() * 11)];
-};

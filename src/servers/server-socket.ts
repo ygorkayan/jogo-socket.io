@@ -2,6 +2,7 @@ import config from '../config';
 import { Server } from 'socket.io';
 import { EventEmitter } from 'events';
 import { httpServer } from './server-static';
+import { IPlayersConnected } from '../helpers/interfaces';
 
 const io = new Server(httpServer, {
   cors: {
@@ -10,14 +11,16 @@ const io = new Server(httpServer, {
 });
 
 export const clientEvent = new EventEmitter();
-export const clientsConnected = new Map();
+const playersConected: IPlayersConnected = [];
 
 io.on('connection', socket => {
-  clientEvent.emit('player-login', socket);
-  clientEvent.emit('players-online', socket)
+  clientEvent.emit('player-login', socket, playersConected);
+  clientEvent.emit('players-online', socket, playersConected);
 
-  socket.on('disconnect', () => clientEvent.emit('disconnect', socket));
-  socket.on('movement', value => clientEvent.emit('movement', value, socket));
+  socket.on('disconnect', () => clientEvent.emit('disconnect', socket, playersConected));
+  socket.on('current-player-movement', value =>
+    clientEvent.emit('current-player-movement', value, socket, playersConected)
+  );
 });
 
 io.listen(config['port-server-socket']);

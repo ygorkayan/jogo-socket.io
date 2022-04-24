@@ -4,7 +4,7 @@ const playersOnline = new Map();
 let player;
 
 body.addEventListener('keydown', event => {
-  eventOfMovement(event);
+  socket.emit('current-player-movement', event.code);
   updateScreen(body, player, playersOnline);
 });
 
@@ -18,11 +18,18 @@ socket.on('player-login', data => {
   updateScreen(body, player, playersOnline);
 });
 
-socket.on('clientMovement', data => {
-  console.log(playersOnline);
-  const playerCurrent = playersOnline.get(data.who);
-  playerCurrent.position.top = data.newPosition.y;
-  playerCurrent.position.left = data.newPosition.x;
+socket.on('player-movement', data => {
+  const { who, newPosition } = data;
+
+  if (who === player.id) {
+    player.position.y = newPosition.y;
+    player.position.x = newPosition.x;
+  } else {
+    const playerCurrent = playersOnline.get(who);
+    playerCurrent.position.y = newPosition.y;
+    playerCurrent.position.x = newPosition.x;
+  }
+
   updateScreen(body, player, playersOnline);
 });
 

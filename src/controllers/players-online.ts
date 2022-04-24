@@ -1,23 +1,18 @@
-import { clientsConnected, clientEvent } from '../servers/server-socket';
-import { playersOnlineWithout } from './helpers';
+import config from '../config';
+import { clientEvent } from '../servers/server-socket';
+import { IPlayers, IPlayersConnected } from '../helpers/interfaces';
+import { playersOnlineWithout } from '../helpers/functions';
 
-clientEvent.on('players-online', socket => {
-  setInterval(() => {
-    const players = playersOnline(clientsConnected, socket.id);
-    socket.emit('players-online', players);
-  }, 1000);
-});
+clientEvent.on('players-online', (socket, playersConected) =>
+  setInterval(
+    () => socket.emit('players-online', playersOnline(playersConected, socket.id)),
+    config['players-online-reload']
+  )
+);
 
-export const playersOnline = (clientsConnected: any, playerCurrentId: any) => {
-  const players: Array<any> = [];
-
-  playersOnlineWithout(clientsConnected, playerCurrentId).forEach((player: any) => {
-    players.push({
-      id: player.id,
-      color: player.color,
-      position: player.position,
-    });
-  });
-
-  return players;
-};
+export const playersOnline = (playersConected: IPlayersConnected, playerCurrentId: string) =>
+  playersOnlineWithout(playersConected, playerCurrentId).map((player: IPlayers) => ({
+    id: player.id,
+    color: player.color,
+    position: player.position,
+  }));

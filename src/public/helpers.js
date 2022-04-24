@@ -1,34 +1,3 @@
-const eventOfMovement = event => {
-  if (player) {
-    const speed = 20;
-    let x = player.position.x;
-    let y = player.position.y;
-
-    switch (event.code) {
-      case 'ArrowLeft':
-        y = y - speed;
-        break;
-
-      case 'ArrowUp':
-        x = x - speed;
-        break;
-
-      case 'ArrowRight':
-        y = y + speed;
-        break;
-
-      case 'ArrowDown':
-        x = x + speed;
-        break;
-    }
-
-    player.position.x = x;
-    player.position.y = y;
-
-    socket.emit('movement', { x, y });
-  }
-};
-
 const updateScreen = (body, player, playersOnline) => {
   deleteAllBox(body);
   body.appendChild(createPlayer(player));
