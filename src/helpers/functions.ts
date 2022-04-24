@@ -1,4 +1,4 @@
-import { IPlayersConnected } from './interfaces';
+import { IPlayersConnected, TMovement, IPlayers, IMovementReturn } from './interfaces';
 
 export const playersOnlineWithout = (playersOnline: IPlayersConnected, CurrentId: string) =>
   playersOnline.filter(player => player.id !== CurrentId);
@@ -30,4 +30,26 @@ export const colorRandom = () => {
   };
 
   return colors[Math.floor(Math.random() * 22)];
+};
+
+export const movement = (typeMovement: TMovement, player: IPlayers, speed: number): IMovementReturn => {
+  let { x, y } = player.position;
+
+  if (typeMovement === 'ArrowLeft') {
+    y -= speed;
+  }
+
+  if (typeMovement === 'ArrowUp') {
+    x -= speed;
+  }
+
+  if (typeMovement === 'ArrowRight') {
+    y += speed;
+  }
+
+  if (typeMovement === 'ArrowDown') {
+    x += speed;
+  }
+
+  return { x, y };
 };

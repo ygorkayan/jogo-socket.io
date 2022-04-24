@@ -1,9 +1,8 @@
 import { clientEvent } from '../servers/server-socket';
-import { IPlayersConnected, IMovement } from '../helpers/interfaces';
-import { playersOnlineWithout } from '../helpers/functions';
+import { IPlayersConnected, TMovement } from '../helpers/interfaces';
 
-clientEvent.on('player-movement', (value: IMovement, socket: any, playersConected: IPlayersConnected) => {
-  playersConected.forEach((player) => {
+clientEvent.on('player-movement', (value: TMovement, socket: any, playersConected: IPlayersConnected) => {
+  playersConected.forEach(player => {
     player.socket.emit('player-movement', {
       who: socket.id,
       newPosition: value,
