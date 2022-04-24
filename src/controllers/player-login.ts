@@ -1,13 +1,13 @@
 import { clientsConnected, clientEvent } from '../servers/server-socket';
 
-clientEvent.on('login', socket => {
+clientEvent.on('player-login', socket => {
   const player = {
     id: socket.id,
     color: colorRandom(),
-    position: { x: '0px', y: '0px' },
+    position: { x: 0, y: 0 },
   };
 
-  socket.emit('login', {
+  socket.emit('player-login', {
     player,
     playersOnline: playersOnline(clientsConnected),
   });
@@ -16,12 +16,13 @@ clientEvent.on('login', socket => {
 });
 
 export const playersOnline = (clientsConnected: any) => {
-  const clients = Array.from(clientsConnected.keys());
+  const players: Array<any> = [];
 
-  return clients.map(idClient => {
-    const { id, color, position } = clientsConnected.get(idClient);
-    return { id, color, position };
+  clientsConnected.forEach((player: any) => {
+    players.push({ id: player.id, color: player.color, position: player.position });
   });
+
+  return players;
 };
 
 export const colorRandom = () => {

@@ -1,4 +1,5 @@
 import { clientsConnected, clientEvent } from '../servers/server-socket';
+import { playersOnlineWithout } from './helpers';
 
 clientEvent.on('movement', (value, socket) => {
   const client = clientsConnected.get(socket.id);
@@ -8,17 +9,12 @@ clientEvent.on('movement', (value, socket) => {
 });
 
 export const notifyAllClientOfMovement = (clientsConnected: Map<any, any>, whoSetMovement: string) => {
-  const clients = Array.from(clientsConnected.keys());
-  const clientsWithoutWhoSetMovement = clients.filter(id => id !== whoSetMovement);
+  const clientsWithoutWhoSetMovement = playersOnlineWithout(clientsConnected, whoSetMovement);
 
-  const newPosition = clientsConnected.get(whoSetMovement).position;
-
-  clientsWithoutWhoSetMovement.forEach(id => {
-    const client = clientsConnected.get(id);
-
+  clientsWithoutWhoSetMovement.forEach((client: any) => {
     const data = {
       who: whoSetMovement,
-      newPosition,
+      newPosition: clientsConnected.get(whoSetMovement).position,
     };
 
     client.socket.emit('clientMovement', data);

@@ -13,8 +13,10 @@ export const clientEvent = new EventEmitter();
 export const clientsConnected = new Map();
 
 io.on('connection', socket => {
-  clientEvent.emit('login', socket);
+  clientEvent.emit('player-login', socket);
+  clientEvent.emit('players-online', socket)
 
+  socket.on('disconnect', () => clientEvent.emit('disconnect', socket));
   socket.on('movement', value => clientEvent.emit('movement', value, socket));
 });
 

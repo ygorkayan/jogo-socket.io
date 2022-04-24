@@ -1,37 +1,46 @@
-const eventOfMovement = (event) => {
+const eventOfMovement = event => {
   if (player) {
     const speed = 20;
-    let top = Number(player.style.top.replace('px', ''));
-    let left = Number(player.style.left.replace('px', ''));
+    let x = player.position.x;
+    let y = player.position.y;
 
-    switch (event.keyCode) {
-      case 37:
-        // seta para esquerda
-        left = `${left - speed}px`;
+    switch (event.code) {
+      case 'ArrowLeft':
+        y = y - speed;
         break;
 
-      case 38:
-        // seta para cima
-        top = `${top - speed}px`;
+      case 'ArrowUp':
+        x = x - speed;
         break;
 
-      case 39:
-        // seta para direita
-        left = `${left + speed}px`;
+      case 'ArrowRight':
+        y = y + speed;
         break;
 
-      case 40:
-        // seta para baixo
-        top = `${top + speed}px`;
+      case 'ArrowDown':
+        x = x + speed;
         break;
     }
 
-    player.style.top = top;
-    player.style.left = left;
+    player.position.x = x;
+    player.position.y = y;
 
-    socket.emit('movement', { x: left, y: top });
+    socket.emit('movement', { x, y });
   }
-}
+};
+
+const updateScreen = (body, player, playersOnline) => {
+  deleteAllBox(body);
+  body.appendChild(createPlayer(player));
+  playersOnline.forEach(player => body.appendChild(createPlayer(player)));
+};
+
+const deleteAllBox = body => {
+  const allBox = body.querySelectorAll('.box');
+  allBox.forEach(box => {
+    box.remove();
+  });
+};
 
 const createPlayer = player => {
   const { id, color, position } = player;
@@ -45,15 +54,4 @@ const createPlayer = player => {
   box.style.left = `${position.y}px`;
 
   return box;
-};
-
-const drawInScreen = (body, player, position) => {
-  const notOnScreen = !body.querySelector(`[playerId='${player.id}']`);
-
-  if (notOnScreen) {
-    body.appendChild(player);
-  }
-
-  player.style.top = `${position.x}px`;
-  player.style.left = `${position.y}px`;
 };

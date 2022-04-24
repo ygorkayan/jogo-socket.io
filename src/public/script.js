@@ -3,22 +3,31 @@ const socket = io('ws://localhost:4000');
 const playersOnline = new Map();
 let player;
 
-body.addEventListener('keydown', eventOfMovement);
+body.addEventListener('keydown', event => {
+  eventOfMovement(event);
+  updateScreen(body, player, playersOnline);
+});
 
-socket.on('login', data => {
-  player = createPlayer(data.player);
-  drawInScreen(body, player, data.player.position);
+socket.on('player-login', data => {
+  player = data.player;
 
   data.playersOnline.forEach(player => {
-    const temp = createPlayer(player);
-
-    playersOnline.set(player.id, temp);
-    drawInScreen(body, temp, data.player.position);
+    playersOnline.set(player.id, player);
   });
+
+  updateScreen(body, player, playersOnline);
 });
 
 socket.on('clientMovement', data => {
-  const player = playersOnline.get(data.who);
-  player.style.top = data.newPosition.y;
-  player.style.left = data.newPosition.x;
+  console.log(playersOnline);
+  const playerCurrent = playersOnline.get(data.who);
+  playerCurrent.position.top = data.newPosition.y;
+  playerCurrent.position.left = data.newPosition.x;
+  updateScreen(body, player, playersOnline);
+});
+
+socket.on('players-online', data => {
+  playersOnline.clear();
+  data.forEach(player => playersOnline.set(player.id, player));
+  updateScreen(body, player, playersOnline);
 });
